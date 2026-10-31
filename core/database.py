@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from core.config import config
 from core.logger import logger
 from database.global_models import Base
+from database.guild_models import GuildConfig  # Register guild models
 
 # Ensure the parent directory for the SQLite file exists on your volume
 if "sqlite" in config.DATABASE_URL:
@@ -29,7 +30,7 @@ async def init_db():
     """Initializes database connection pool, creates tables, and verifies connectivity."""
     try:
         async with engine.begin() as conn:
-            # Automatically create all tables (Global users, inventory, etc.)
+            # Automatically create all tables (Global & Guild models)
             await conn.run_sync(Base.metadata.create_all)
             logger.info("🔥 Secure SQLite connection established on your Railway volume. Tables synchronized.")
     except Exception as e:
