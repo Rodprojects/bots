@@ -1,11 +1,10 @@
-
 import discord
 from discord.ext import commands
 import datetime
 import importlib
 import sys
 
-class RedRoomUtilities:
+class RedRoomUtilities(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
