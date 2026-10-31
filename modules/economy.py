@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from core.database import AsyncSessionLocal
 from database.global_models import GlobalUser, GlobalInventory
 
-class EconomyModule:
+class EconomyModule(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
