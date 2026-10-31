@@ -13,6 +13,7 @@ class HelpMenuView(discord.ui.View):
         self.current_page = 0
         self.selected_category = "All"
         self.pages = []
+        self.files = []
         self._build_pages()
 
     def _build_pages(self):
@@ -43,7 +44,7 @@ class HelpMenuView(discord.ui.View):
                 description="*No commands found in this category.*",
                 color=0x8B0000
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
             self.pages.append(embed)
             return
 
@@ -59,7 +60,7 @@ class HelpMenuView(discord.ui.View):
                 ),
                 color=0x8B0000
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
 
             for cmd in chunk:
                 aliases_str = f" (Aliases: `!{'`, `!'.join(cmd.aliases)}`)" if cmd.aliases else ""
@@ -87,7 +88,8 @@ class HelpMenuView(discord.ui.View):
     async def prev_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_page > 0:
             self.current_page -= 1
-            await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
+            await interaction.response.edit_message(attachments=[file], embed=self.pages[self.current_page], view=self)
         else:
             await interaction.response.defer()
 
@@ -95,7 +97,8 @@ class HelpMenuView(discord.ui.View):
     async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_page < len(self.pages) - 1:
             self.current_page += 1
-            await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
+            await interaction.response.edit_message(attachments=[file], embed=self.pages[self.current_page], view=self)
         else:
             await interaction.response.defer()
 
@@ -108,18 +111,20 @@ class RedRoomUtilities(commands.Cog):
     async def ping(self, ctx: commands.Context):
         latency = round(self.bot.latency * 1000)
 
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title="🍷 Heartbeat Check",
             description=f"My pulse is currently beating at **{latency}ms**.\n*Care to test how much load I can handle, Master?*",
             color=0x8B0000
         )
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.set_footer(text="Night Ecosystem — Always listening, always ready.")
 
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="night", help="Displays information about the Night ecosystem.")
     async def night_info(self, ctx: commands.Context):
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title="🌹 The Red Room Awaits",
             description=(
@@ -128,7 +133,7 @@ class RedRoomUtilities(commands.Cog):
             ),
             color=0x0000FF
         )
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.add_field(
             name="🔒 Status",
             value="Encrypted, persistent, and entirely under your control.",
@@ -136,7 +141,7 @@ class RedRoomUtilities(commands.Cog):
         )
         embed.set_footer(text="Designed for absolute dominance.")
 
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="servers", help="See all servers Night has joined with direct invite links.")
     async def servers(self, ctx: commands.Context):
@@ -144,13 +149,14 @@ class RedRoomUtilities(commands.Cog):
         guilds = list(self.bot.guilds)
 
         if not guilds:
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
             embed = discord.Embed(
                 title="🌐 Empire Network",
                 description="I am currently not bound to any servers. How lonely...",
                 color=0x8B0000
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
-            await ctx.send(embed=embed)
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
+            await ctx.send(file=file, embed=embed)
             return
 
         chunk_size = 5
@@ -161,7 +167,7 @@ class RedRoomUtilities(commands.Cog):
                 description="Here is where my presence is currently felt. Click to enter:",
                 color=0x0000FF
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
 
             for guild in chunk:
                 invite_link = "Unable to create invite"
@@ -189,7 +195,8 @@ class RedRoomUtilities(commands.Cog):
 
             embeds.append(embed)
 
-        await ctx.send(embed=embeds[0])
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
+        await ctx.send(file=file, embed=embeds[0])
 
     # ===== DELETE MEDIA COMMAND =====
     @commands.command(
@@ -283,7 +290,8 @@ class RedRoomUtilities(commands.Cog):
             await ctx.send("❌ *No commands found in the grimoire.*")
             return
 
-        await ctx.send(embed=view.pages[0], view=view)
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
+        await ctx.send(file=file, embed=view.pages[0], view=view)
 
     @commands.command(name="refresh", help="Reloads extensions and synchronizes database modules.")
     async def refresh_cmd(self, ctx: commands.Context):
@@ -299,28 +307,30 @@ class RedRoomUtilities(commands.Cog):
             await ctx.send(f"❌ *Command `!{command_name}` is nowhere to be found in my grid.*")
             return
 
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title=f"🔍 Command Diagnostics: !{cmd.name}",
             color=0x8B0000
         )
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.add_field(name="Status", value="🟢 Active & Registered", inline=False)
         embed.add_field(name="Source Module / Cog", value=f"`{cmd.cog_name or 'Global / Core Script'}`", inline=False)
         embed.add_field(name="Help Text", value=cmd.help or "None", inline=False)
         embed.add_field(name="Checks / Permissions", value=str(cmd.checks) if cmd.checks else "None required", inline=False)
 
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="dashboard", help="Provides the direct link to the web management dashboard.")
     async def dashboard(self, ctx: commands.Context):
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title="🖥️ The Red Room Web Portal",
             description="Manage your empire with supreme elegance through our web dashboard.",
             color=0x0000FF
         )
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.add_field(name="Portal Link", value="[Access Night Dashboard](https://railway.app)", inline=False)
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="backup", help="Creates a secure database backup.")
     async def backup(self, ctx: commands.Context):
