@@ -7,7 +7,7 @@ load_dotenv()
 class Config:
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
     # Defaults to a persistent volume folder (e.g., /app/data/night.db or data/night.db)
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/night.db")
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:////app/data/night.db")
     WEB_PORT = int(os.getenv("WEB_PORT", 8000))
     DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() == "true"
 
