@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/redroom_db")
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/night_db")
     WEB_PORT = int(os.getenv("WEB_PORT", 8000))
     DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() == "true"
 
