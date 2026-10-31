@@ -10,7 +10,7 @@ from core.config import config
 from core.logger import logger
 from core.database import init_db, close_db
 
-class RedRoomBot(commands.Bot):
+class NightBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
@@ -24,7 +24,7 @@ class RedRoomBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        logger.info("🍷 Initiating Red-Room Ecosystem Core Sequences...")
+        logger.info("🍷 Initiating Night Ecosystem Core Sequences...")
         
         # 1. Initialize Database
         await init_db()
@@ -87,13 +87,13 @@ class RedRoomBot(commands.Bot):
             logger.error(f"⚠️ Error while re-anchoring persistent views: {e}")
 
     async def on_ready(self):
-        logger.info(f"🌹 Connected as {self.user} (ID: {self.user.id}) — The Red Room is open.")
+        logger.info(f"🌹 Connected as {self.user} (ID: {self.user.id}) — Night has fallen.")
 
 async def main():
     # Validate environment configuration before starting
     config.validate()
 
-    bot = RedRoomBot()
+    bot = NightBot()
 
     try:
         async with bot:
