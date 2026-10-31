@@ -2,11 +2,11 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from core.config import config
 from core.logger import logger
+from database.global_models import Base
 
 # Ensure the parent directory for the SQLite file exists on your volume
 if "sqlite" in config.DATABASE_URL:
     db_path = config.DATABASE_URL.replace("sqlite+aiosqlite:///", "").replace("sqlite:///", "")
-    # Handle absolute or relative paths
     if "/" in db_path:
         dir_name = os.path.dirname(db_path)
         if dir_name and not os.path.exists(dir_name):
@@ -26,12 +26,14 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 async def init_db():
-    """Initializes database connection pool and verifies connectivity."""
+    """Initializes database connection pool, creates tables, and verifies connectivity."""
     try:
         async with engine.begin() as conn:
-            logger.info("🔥 Secure SQLite connection established on your Railway volume. Night is locked in.")
+            # Automatically create all tables (Global users, inventory, etc.)
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("🔥 Secure SQLite connection established on your Railway volume. Tables synchronized.")
     except Exception as e:
-        logger.error(f"❌ Database connection failed: {e}")
+        logger.error(f"❌ Database initialization failed: {e}")
         raise
 
 async def close_db():
