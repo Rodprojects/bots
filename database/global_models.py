@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 import datetime
 
@@ -10,7 +10,7 @@ class GlobalUser(Base):
     user_id = Column(BigInteger, primary_key=True, index=True)
     lunas = Column(Integer, default=100)
     
-    # Timestamps for rewards
+    # Timestamps for rewards & actions
     last_daily = Column(DateTime, nullable=True)
     last_weekly = Column(DateTime, nullable=True)
     last_monthly = Column(DateTime, nullable=True)
