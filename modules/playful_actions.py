@@ -18,8 +18,14 @@ class PlayfulActions(commands.Cog):
             res_author = await session.execute(select(GlobalUser).where(GlobalUser.user_id == ctx.author.id))
             author_db = res_author.scalar_one_or_none()
             if not author_db:
-                author_db = GlobalUser(user_id=ctx.author.id)
+                author_db = GlobalUser(user_id=ctx.author.id, lunas=100, actions_given=0, actions_received=0)
                 session.add(author_db)
+
+            # Safeguard default values if DB returns None for counters
+            if author_db.lunas is None:
+                author_db.lunas = 100
+            if author_db.actions_given is None:
+                author_db.actions_given = 0
 
             # Check 12-hour cooldown
             if author_db.last_action:
@@ -42,16 +48,20 @@ class PlayfulActions(commands.Cog):
                 res_target = await session.execute(select(GlobalUser).where(GlobalUser.user_id == target.id))
                 target_db = res_target.scalar_one_or_none()
                 if not target_db:
-                    target_db = GlobalUser(user_id=target.id)
+                    target_db = GlobalUser(user_id=target.id, lunas=100, actions_given=0, actions_received=0)
                     session.add(target_db)
+                if target_db.actions_received is None:
+                    target_db.actions_received = 0
                 target_db.actions_received += 1
 
             if secondary_target and secondary_target.id != ctx.author.id:
                 res_target2 = await session.execute(select(GlobalUser).where(GlobalUser.user_id == secondary_target.id))
                 target2_db = res_target2.scalar_one_or_none()
                 if not target2_db:
-                    target2_db = GlobalUser(user_id=secondary_target.id)
+                    target2_db = GlobalUser(user_id=secondary_target.id, lunas=100, actions_given=0, actions_received=0)
                     session.add(target2_db)
+                if target2_db.actions_received is None:
+                    target2_db.actions_received = 0
                 target2_db.actions_received += 1
 
             await session.commit()
