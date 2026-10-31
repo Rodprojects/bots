@@ -21,7 +21,7 @@ async def init_db():
     """Initializes database connection pool and verifies connectivity."""
     try:
         async with engine.begin() as conn:
-            logger.info("🔥 Secure database connection established. PostgreSQL heartbeat pulsing.")
+            logger.info("🔥 Secure database connection established for Night. PostgreSQL heartbeat pulsing.")
     except Exception as e:
         logger.error(f"❌ Database connection failed: {e}")
         raise
