@@ -81,13 +81,15 @@ class PlayfulActions(commands.Cog):
             t_str = target.mention if target else ctx.author.mention
             desc = f"{ctx.author.mention} executes **!{action_name}** on {t_str}!"
 
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title=f"🔥 Action: {action_name.capitalize()}",
             description=f"{desc}\n\n✨ Earned **+{lunas_earned} Lunas**.",
             color=0x8B0000
         )
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.set_footer(text=f"Cooldown for !{action_name}: 12 Hours")
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="whip")
     async def whip(self, ctx, member: discord.Member = None):
