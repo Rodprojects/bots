@@ -3,22 +3,20 @@ from discord.ext import commands
 import datetime
 from sqlalchemy.future import select
 from core.database import AsyncSessionLocal
-from database.global_models import GlobalUser
+from database.global_models import GlobalUser, GlobalInventory
 
 class RewardsModule(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     async def get_or_create_user(self, session, user_id: int) -> GlobalUser:
-        res = await session.execute(select(GlobalUser).where(GlobalUser.user_id == user_id))
-        user = res.scalar_one_or_none()
+        result = await session.execute(select(GlobalUser).where(GlobalUser.user_id == user_id))
+        user = result.scalar_one_or_none()
         if not user:
             user = GlobalUser(user_id=user_id, lunas=100)
             session.add(user)
             await session.commit()
             await session.refresh(user)
-        if user.lunas is None:
-            user.lunas = 100
         return user
 
     @commands.command(name="daily", help="Claim your daily Lunas reward.")
@@ -37,7 +35,12 @@ class RewardsModule(commands.Cog):
             user.last_daily = now
             await session.commit()
 
-            embed = discord.Embed(title="🎁 Daily Reward", description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", color=0x4B0082)
+            embed = discord.Embed(
+                title="🎁 Daily Reward", 
+                description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", 
+                color=0x0000FF
+            )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
             await ctx.send(embed=embed)
 
     @commands.command(name="weekly", help="Claim your weekly Lunas reward.")
@@ -58,7 +61,12 @@ class RewardsModule(commands.Cog):
             user.last_weekly = now
             await session.commit()
 
-            embed = discord.Embed(title="👑 Weekly Reward", description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", color=0x8B0000)
+            embed = discord.Embed(
+                title="👑 Weekly Reward", 
+                description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", 
+                color=0x0000FF
+            )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
             await ctx.send(embed=embed)
 
     @commands.command(name="monthly", help="Claim your monthly Lunas reward.")
@@ -78,7 +86,12 @@ class RewardsModule(commands.Cog):
             user.last_monthly = now
             await session.commit()
 
-            embed = discord.Embed(title="🍷 Monthly Reward", description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", color=0x4B0082)
+            embed = discord.Embed(
+                title="🍷 Monthly Reward", 
+                description=f"You claimed **+{reward} Lunas**!\nYour vault holds **{user.lunas:,} Lunas**.", 
+                color=0x0000FF
+            )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
             await ctx.send(embed=embed)
 
 async def setup(bot: commands.Bot):
