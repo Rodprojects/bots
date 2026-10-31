@@ -30,7 +30,7 @@ class EconomyModule(commands.Cog):
             embed = discord.Embed(
                 title=f"🌙 Vault of {target.display_name}",
                 description=f"Your global wealth across the Night empire:\n\n💎 **{user.lunas:,} Lunas**",
-                color=0x0000FF
+                color=0x4B0082
             )
             embed.set_thumbnail(url="attachment://nightlogo.jpg")
             embed.set_footer(text="Earned worldwide. Spent wherever you desire.")
@@ -63,7 +63,7 @@ class EconomyModule(commands.Cog):
             embed = discord.Embed(
                 title="💸 Transfer Complete",
                 description=f"You successfully transferred **{amount:,} Lunas** to {member.mention}.\nA transaction recorded across all shadows.",
-                color=0x0000FF
+                color=0x4B0082
             )
             embed.set_thumbnail(url="attachment://nightlogo.jpg")
             await ctx.send(file=file, embed=embed)
@@ -74,7 +74,7 @@ class EconomyModule(commands.Cog):
         embed = discord.Embed(
             title="🛍️ The Red Room Global Boutique",
             description="Spend your hard-earned **Lunas**. Items purchased here stay on your global account forever.",
-            color=0x0000FF
+            color=0x8B0000
         )
         embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.add_field(
@@ -130,7 +130,7 @@ class EconomyModule(commands.Cog):
             embed = discord.Embed(
                 title="✨ Acquisition Successful",
                 description=f"You purchased the **{item_data['name']}** for **{item_data['cost']:,} Lunas**.\nIt is now permanently bound to your global account.",
-                color=0x0000FF
+                color=0x4B0082
             )
             embed.set_thumbnail(url="attachment://nightlogo.jpg")
             await ctx.send(file=file, embed=embed)
@@ -151,7 +151,7 @@ class EconomyModule(commands.Cog):
             embed = discord.Embed(
                 title=f"🎒 Global Inventory — {target.display_name}",
                 description="Treasures and artifacts collected across all realms:",
-                color=0x0000FF
+                color=0x8B0000
             )
             embed.set_thumbnail(url="attachment://nightlogo.jpg")
 
@@ -161,6 +161,7 @@ class EconomyModule(commands.Cog):
                 item_list = "\n".join([f"• `{item.item_name}` (Acquired: {item.acquired_at.strftime('%Y-%m-%d')})" for item in items])
                 embed.add_field(name="Owned Artifacts", value=item_list, inline=False)
 
+            embed.set_thumbnail(url=target.display_avatar.url)
             await ctx.send(file=file, embed=embed)
 
 async def setup(bot: commands.Bot):
