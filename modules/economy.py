@@ -1,4 +1,4 @@
-import discord
+import discordimport discord
 from discord.ext import commands
 import datetime
 from sqlalchemy.future import select
@@ -33,33 +33,6 @@ class EconomyModule(commands.Cog):
             )
             embed.set_thumbnail(url=target.display_avatar.url)
             embed.set_footer(text="Earned worldwide. Spent wherever you desire.")
-            await ctx.send(embed=embed)
-
-    @commands.command(name="daily", help="Claims your daily tribute of Lunas to fuel your desires.")
-    async def daily(self, ctx: commands.Context):
-        now = datetime.datetime.utcnow()
-        
-        async with AsyncSessionLocal() as session:
-            user = await self.get_or_create_user(session, ctx.author.id)
-            
-            if user.last_daily:
-                elapsed = now - user.last_daily
-                if elapsed.total_seconds() < 86400:
-                    remaining = int(86400 - elapsed.total_seconds())
-                    hours = remaining // 3600
-                    minutes = (remaining % 3600) // 60
-                    await ctx.send(f"⏳ *Patience, my sweet. Your next daily tribute of Lunas is ready in **{hours}h {minutes}m**.*")
-                    return
-
-            user.lunas += 250  # Daily payout
-            user.last_daily = now
-            await session.commit()
-
-            embed = discord.Embed(
-                title="🌹 Daily Tribute Collected",
-                description=f"You claimed your daily **250 Lunas**.\nYour global vault now holds **{user.lunas:,} Lunas**.",
-                color=0x8B0000  # Blood Red
-            )
             await ctx.send(embed=embed)
 
     @commands.command(name="pay", aliases=[payments := "transfer"], help="Transfers Lunas from your global wallet to another member.")
