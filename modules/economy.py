@@ -26,14 +26,15 @@ class EconomyModule(commands.Cog):
         async with AsyncSessionLocal() as session:
             user = await self.get_or_create_user(session, target.id)
             
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
             embed = discord.Embed(
                 title=f"🌙 Vault of {target.display_name}",
                 description=f"Your global wealth across the Night empire:\n\n💎 **{user.lunas:,} Lunas**",
                 color=0x0000FF
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
             embed.set_footer(text="Earned worldwide. Spent wherever you desire.")
-            await ctx.send(embed=embed)
+            await ctx.send(file=file, embed=embed)
 
     @commands.command(name="pay", aliases=["transfer"], help="Transfers Lunas from your global wallet to another member.")
     async def pay(self, ctx: commands.Context, member: discord.Member, amount: int):
@@ -58,22 +59,24 @@ class EconomyModule(commands.Cog):
             receiver.lunas += amount
             await session.commit()
 
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
             embed = discord.Embed(
                 title="💸 Transfer Complete",
                 description=f"You successfully transferred **{amount:,} Lunas** to {member.mention}.\nA transaction recorded across all shadows.",
                 color=0x0000FF
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
-            await ctx.send(embed=embed)
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
+            await ctx.send(file=file, embed=embed)
 
     @commands.command(name="shop", help="Displays the global Red Room shop for purchasing items.")
     async def shop(self, ctx: commands.Context):
+        file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
         embed = discord.Embed(
             title="🛍️ The Red Room Global Boutique",
             description="Spend your hard-earned **Lunas**. Items purchased here stay on your global account forever.",
             color=0x0000FF
         )
-        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+        embed.set_thumbnail(url="attachment://nightlogo.jpg")
         embed.add_field(
             name="1. Velvet Blindfold 🖤",
             value="Price: `500 Lunas`\n*Grants an exclusive cosmetic title in your global profile.*\nCommand: `!buy blindfold`",
@@ -85,7 +88,7 @@ class EconomyModule(commands.Cog):
             inline=False
         )
         embed.set_footer(text="Use !buy <item_name> to acquire your desires.")
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @commands.command(name="buy", help="Purchases an item from the global shop.")
     async def buy(self, ctx: commands.Context, item_name: str):
@@ -123,13 +126,14 @@ class EconomyModule(commands.Cog):
             session.add(new_item)
             await session.commit()
 
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
             embed = discord.Embed(
                 title="✨ Acquisition Successful",
                 description=f"You purchased the **{item_data['name']}** for **{item_data['cost']:,} Lunas**.\nIt is now permanently bound to your global account.",
                 color=0x0000FF
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
-            await ctx.send(embed=embed)
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
+            await ctx.send(file=file, embed=embed)
 
     @commands.command(name="inventory", aliases=["inv"], help="Inspects items stored in your global profile inventory.")
     async def inventory(self, ctx: commands.Context, member: discord.Member = None):
@@ -143,12 +147,13 @@ class EconomyModule(commands.Cog):
             )
             items = result.scalars().all()
 
+            file = discord.File("nightlogo.jpg", filename="nightlogo.jpg")
             embed = discord.Embed(
                 title=f"🎒 Global Inventory — {target.display_name}",
                 description="Treasures and artifacts collected across all realms:",
                 color=0x0000FF
             )
-            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
+            embed.set_thumbnail(url="attachment://nightlogo.jpg")
 
             if not items:
                 embed.add_field(name="Empty Vault", value="*No items acquired yet. Visit `!shop` to browse.*", inline=False)
@@ -156,7 +161,7 @@ class EconomyModule(commands.Cog):
                 item_list = "\n".join([f"• `{item.item_name}` (Acquired: {item.acquired_at.strftime('%Y-%m-%d')})" for item in items])
                 embed.add_field(name="Owned Artifacts", value=item_list, inline=False)
 
-            await ctx.send(embed=embed)
+            await ctx.send(file=file, embed=embed)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(EconomyModule(bot))
