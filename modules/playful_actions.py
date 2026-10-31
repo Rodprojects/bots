@@ -1,0 +1,117 @@
+import discord
+from discord.ext import commands
+import datetime
+import random
+from sqlalchemy.future import select
+from core.database import AsyncSessionLocal
+from database.global_models import GlobalUser
+
+class PlayfulActions(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+    async def _process_action(self, ctx: commands.Context, action_name: str, target: discord.Member = None, secondary_target: discord.Member = None):
+        now = datetime.datetime.utcnow()
+
+        async with AsyncSessionLocal() as session:
+            # Fetch or create author profile
+            res_author = await session.execute(select(GlobalUser).where(GlobalUser.user_id == ctx.author.id))
+            author_db = res_author.scalar_one_or_none()
+            if not author_db:
+                author_db = GlobalUser(user_id=ctx.author.id)
+                session.add(author_db)
+
+            # Check 12-hour cooldown
+            if author_db.last_action:
+                elapsed = (now - author_db.last_action).total_seconds()
+                if elapsed < 43200:  # 12 hours in seconds
+                    remaining = int(43200 - elapsed)
+                    hours = remaining // 3600
+                    minutes = (remaining % 3600) // 60
+                    await ctx.send(f"⏳ *Patience... You must wait **{hours}h {minutes}m** before taking another action.*")
+                    return
+
+            # Determine reward & apply updates
+            lunas_earned = random.randint(20, 100)
+            author_db.lunas += lunas_earned
+            author_db.last_action = now
+            author_db.actions_given += 1
+
+            # Update target statistics if target exists
+            if target and target.id != ctx.author.id:
+                res_target = await session.execute(select(GlobalUser).where(GlobalUser.user_id == target.id))
+                target_db = res_target.scalar_one_or_none()
+                if not target_db:
+                    target_db = GlobalUser(user_id=target.id)
+                    session.add(target_db)
+                target_db.actions_received += 1
+
+            if secondary_target and secondary_target.id != ctx.author.id:
+                res_target2 = await session.execute(select(GlobalUser).where(GlobalUser.user_id == secondary_target.id))
+                target2_db = res_target2.scalar_one_or_none()
+                if not target2_db:
+                    target2_db = GlobalUser(user_id=secondary_target.id)
+                    session.add(target2_db)
+                target2_db.actions_received += 1
+
+            await session.commit()
+
+        # Format public response based on targeting
+        if action_name == "threesome":
+            t1 = target.mention if target else ctx.author.mention
+            t2 = secondary_target.mention if secondary_target else "the shadow"
+            desc = f"{ctx.author.mention} initiates a playful encounter with {t1} and {t2}!"
+        else:
+            t_str = target.mention if target else ctx.author.mention
+            desc = f"{ctx.author.mention} executes **!{action_name}** on {t_str}!"
+
+        embed = discord.Embed(
+            title=f"🔥 Action: {action_name.capitalize()}",
+            description=f"{desc}\n\n✨ Earned **+{lunas_earned} Lunas**.",
+            color=0x8B0000
+        )
+        embed.set_footer(text="Cooldown: 12 Hours")
+        await ctx.send(embed=embed)
+
+    @commands.command(name="whip")
+    async def whip(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "whip", member)
+
+    @commands.command(name="tie")
+    async def tie(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "tie", member)
+
+    @commands.command(name="spank")
+    async def spank(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "spank", member)
+
+    @commands.command(name="beg")
+    async def beg(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "beg", member)
+
+    @commands.command(name="gag")
+    async def gag(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "gag", member)
+
+    @commands.command(name="spit")
+    async def spit(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "spit", member)
+
+    @commands.command(name="slut")
+    async def slut(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "slut", member)
+
+    @commands.command(name="pimp")
+    async def pimp(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "pimp", member)
+
+    @commands.command(name="choke")
+    async def choke(self, ctx, member: discord.Member = None):
+        await self._process_action(ctx, "choke", member)
+
+    @commands.command(name="threesome")
+    async def threesome(self, ctx, member1: discord.Member = None, member2: discord.Member = None):
+        await self._process_action(ctx, "threesome", member1, member2)
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(PlayfulActions(bot))
