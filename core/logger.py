@@ -7,7 +7,7 @@ def setup_logger():
 
     handler = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter(
-        "[{asctime}] [{levelname.name}] {name}: {message}",
+        "[{asctime}] [{levelname}] {name}: {message}",
         datefmt="%Y-%m-%d %H:%M:%S",
         style="{"
     )
