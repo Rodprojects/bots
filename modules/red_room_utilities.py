@@ -4,6 +4,101 @@ import datetime
 import importlib
 import sys
 
+# Persistent View for Interactive Help Menu Navigation
+class HelpMenuView(discord.ui.View):
+    def __init__(self, bot: commands.Bot, author_id: int):
+        super().__init__(timeout=180)  # Active for 3 minutes per invocation
+        self.bot = bot
+        self.author_id = author_id
+        self.current_page = 0
+        self.selected_category = "All"
+        self.pages = []
+        self._build_pages()
+
+    def _build_pages(self):
+        # Group commands by Cog / Category
+        cogs = {}
+        for cmd in self.bot.commands:
+            if cmd.hidden:
+                continue
+            category = cmd.cog_name or "Core Utilities"
+            if category not in cogs:
+                cogs[category] = []
+            cogs[category].append(cmd)
+
+        filtered_commands = []
+        if self.selected_category == "All":
+            for cmds in cogs.values():
+                filtered_commands.extend(cmds)
+        else:
+            filtered_commands = cogs.get(self.selected_category, [])
+
+        chunk_size = 4
+        self.pages = []
+        total_commands = len(filtered_commands)
+        
+        if not filtered_commands:
+            embed = discord.Embed(
+                title="🌹 Night's Grimoire — Command Index",
+                description="*No commands found in this category.*",
+                color=0x8B0000
+            )
+            self.pages.append(embed)
+            return
+
+        total_pages = (total_commands + chunk_size - 1) // chunk_size
+
+        for i in range(0, total_commands, chunk_size):
+            chunk = filtered_commands[i:i + chunk_size]
+            embed = discord.Embed(
+                title="🌹 Night's Grimoire — Command Index",
+                description=(
+                    f"Welcome to the dark side, Master. Below are the active commands within Night's grid.\n"
+                    f"**Category:** `{self.selected_category}` | **Total Commands:** `{total_commands}`"
+                ),
+                color=0x8B0000
+            )
+            embed.set_thumbnail(url=self.bot.user.display_avatar.url if self.bot.user else None)
+
+            for cmd in chunk:
+                aliases_str = f" (Aliases: `!{'`, `!'.join(cmd.aliases)}`)" if cmd.aliases else ""
+                embed.add_field(
+                    name=f"✨ `!{cmd.name}`{aliases_str}",
+                    value=f"> {cmd.help or 'No detailed instructions provided. Pure mystery.'}",
+                    inline=False
+                )
+
+            embed.set_footer(
+                text=f"Page {(i // chunk_size) + 1} of {total_pages} • Night Ecosystem • Designed for Dominance"
+            )
+            self.pages.append(embed)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message(
+                "❌ *Only the one who summoned the Grimoire may turn its pages.*", 
+                ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="Previous", style=discord.ButtonStyle.secondary, emoji="◀️")
+    async def prev_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page > 0:
+            self.current_page -= 1
+            await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
+        else:
+            await interaction.response.defer()
+
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.danger, emoji="▶️")
+    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page < len(self.pages) - 1:
+            self.current_page += 1
+            await interaction.response.edit_message(embed=self.pages[self.current_page], view=self)
+        else:
+            await interaction.response.defer()
+
+
 class RedRoomUtilities(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -174,39 +269,16 @@ class RedRoomUtilities(commands.Cog):
     # ===== HELP NIGHT COMMAND =====
     @commands.command(
         name="helpnight",
-        help="Scans the code and displays available commands across interactive paginated embeds."
+        aliases=["help", "commands"],
+        help="Scans the code and displays available commands across interactive paginated embeds with navigation buttons."
     )
     async def helpnight(self, ctx: commands.Context):
-        commands_list = list(self.bot.commands)
-        chunk_size = 4
-        embeds = []
-
-        for i in range(0, len(commands_list), chunk_size):
-            chunk = commands_list[i:i + chunk_size]
-
-            embed = discord.Embed(
-                title="🌹 Night's Grimoire — Command Index",
-                description="Explore my capabilities. Use the arrows below to navigate through the shadows.",
-                color=0x4B0082
-            )
-
-            for cmd in chunk:
-                embed.add_field(
-                    name=f"!{cmd.name}",
-                    value=cmd.help or "No description provided. Pure mystery.",
-                    inline=False
-                )
-
-            embed.set_footer(
-                text=f"Page {(i // chunk_size) + 1} of {(len(commands_list) + chunk_size - 1) // chunk_size}"
-            )
-            embeds.append(embed)
-
-        if not embeds:
-            await ctx.send("No commands registered.")
+        view = HelpMenuView(self.bot, ctx.author.id)
+        if not view.pages:
+            await ctx.send("❌ *No commands found in the grimoire.*")
             return
 
-        msg = await ctx.send(embed=embeds[0])
+        await ctx.send(embed=view.pages[0], view=view)
 
     @commands.command(name="refresh", help="Reloads extensions and synchronizes database modules.")
     async def refresh_cmd(self, ctx: commands.Context):
