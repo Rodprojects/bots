@@ -1,13 +1,21 @@
-import asyncio
+import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from core.config import config
 from core.logger import logger
 
-# Initialize Async Engine for PostgreSQL
+# Ensure the parent directory for the SQLite file exists on your volume
+if "sqlite" in config.DATABASE_URL:
+    db_path = config.DATABASE_URL.replace("sqlite+aiosqlite:///", "").replace("sqlite:///", "")
+    # Handle absolute or relative paths
+    if "/" in db_path:
+        dir_name = os.path.dirname(db_path)
+        if dir_name and not os.path.exists(dir_name):
+            os.makedirs(dir_name, exist_ok=True)
+
+# Initialize Async Engine for SQLite on Volume
 engine = create_async_engine(
     config.DATABASE_URL,
     echo=config.DEBUG_MODE,
-    pool_pre_ping=True,
     future=True
 )
 
@@ -21,7 +29,7 @@ async def init_db():
     """Initializes database connection pool and verifies connectivity."""
     try:
         async with engine.begin() as conn:
-            logger.info("🔥 Secure database connection established for Night. PostgreSQL heartbeat pulsing.")
+            logger.info("🔥 Secure SQLite connection established on your Railway volume. Night is locked in.")
     except Exception as e:
         logger.error(f"❌ Database connection failed: {e}")
         raise
