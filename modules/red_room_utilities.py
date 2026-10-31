@@ -43,6 +43,7 @@ class HelpMenuView(discord.ui.View):
                 description="*No commands found in this category.*",
                 color=0x8B0000
             )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
             self.pages.append(embed)
             return
 
@@ -58,7 +59,7 @@ class HelpMenuView(discord.ui.View):
                 ),
                 color=0x8B0000
             )
-            embed.set_thumbnail(url=self.bot.user.display_avatar.url if self.bot.user else None)
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
 
             for cmd in chunk:
                 aliases_str = f" (Aliases: `!{'`, `!'.join(cmd.aliases)}`)" if cmd.aliases else ""
@@ -112,6 +113,7 @@ class RedRoomUtilities(commands.Cog):
             description=f"My pulse is currently beating at **{latency}ms**.\n*Care to test how much load I can handle, Master?*",
             color=0x8B0000
         )
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
         embed.set_footer(text="Night Ecosystem — Always listening, always ready.")
 
         await ctx.send(embed=embed)
@@ -124,8 +126,9 @@ class RedRoomUtilities(commands.Cog):
                 "I am **Night**—your exclusive, highly polished, and seductive digital companion. "
                 "Running smoothly on secure volumes and private databases, built to command your community with absolute elegance."
             ),
-            color=0x4B0082
+            color=0x0000FF
         )
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
         embed.add_field(
             name="🔒 Status",
             value="Encrypted, persistent, and entirely under your control.",
@@ -146,6 +149,7 @@ class RedRoomUtilities(commands.Cog):
                 description="I am currently not bound to any servers. How lonely...",
                 color=0x8B0000
             )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
             await ctx.send(embed=embed)
             return
 
@@ -155,8 +159,9 @@ class RedRoomUtilities(commands.Cog):
             embed = discord.Embed(
                 title=f"🌐 Empire Network ({len(guilds)} Total Realms)",
                 description="Here is where my presence is currently felt. Click to enter:",
-                color=0x4B0082
+                color=0x0000FF
             )
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
 
             for guild in chunk:
                 invite_link = "Unable to create invite"
@@ -298,6 +303,7 @@ class RedRoomUtilities(commands.Cog):
             title=f"🔍 Command Diagnostics: !{cmd.name}",
             color=0x8B0000
         )
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
         embed.add_field(name="Status", value="🟢 Active & Registered", inline=False)
         embed.add_field(name="Source Module / Cog", value=f"`{cmd.cog_name or 'Global / Core Script'}`", inline=False)
         embed.add_field(name="Help Text", value=cmd.help or "None", inline=False)
@@ -310,8 +316,9 @@ class RedRoomUtilities(commands.Cog):
         embed = discord.Embed(
             title="🖥️ The Red Room Web Portal",
             description="Manage your empire with supreme elegance through our web dashboard.",
-            color=0x4B0082
+            color=0x0000FF
         )
+        embed.set_thumbnail(url="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/nightlogo.jpg")
         embed.add_field(name="Portal Link", value="[Access Night Dashboard](https://railway.app)", inline=False)
         await ctx.send(embed=embed)
 
