@@ -2,7 +2,7 @@ import logging
 import sys
 
 def setup_logger():
-    logger = logging.getLogger("RedRoomEcosystem")
+    logger = logging.getLogger("NightEcosystem")
     logger.setLevel(logging.INFO)
 
     handler = logging.StreamHandler(sys.stdout)
