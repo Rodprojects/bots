@@ -6,7 +6,8 @@ load_dotenv()
 
 class Config:
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/night_db")
+    # Defaults to a persistent volume folder (e.g., /app/data/night.db or data/night.db)
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/night.db")
     WEB_PORT = int(os.getenv("WEB_PORT", 8000))
     DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() == "true"
 
@@ -15,8 +16,6 @@ class Config:
         missing = []
         if not cls.DISCORD_TOKEN:
             missing.append("DISCORD_TOKEN")
-        if not cls.DATABASE_URL:
-            missing.append("DATABASE_URL")
         if missing:
             raise ValueError(f"🚨 Critical security protocol violation! Missing environment variables: {', '.join(missing)}")
 
