@@ -9,9 +9,23 @@ from database.global_models import GlobalUser
 class PlayfulActions(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        # Dictionary tracking separate 12-hour cooldowns per user and per command action
+        self.action_cooldowns = {}
 
     async def _process_action(self, ctx: commands.Context, action_name: str, target: discord.Member = None, secondary_target: discord.Member = None):
         now = datetime.datetime.utcnow()
+        user_key = (ctx.author.id, action_name)
+
+        # Per-action 12-hour cooldown check
+        if user_key in self.action_cooldowns:
+            last_used = self.action_cooldowns[user_key]
+            elapsed = (now - last_used).total_seconds()
+            if elapsed < 43200:  # 12 hours
+                remaining = int(43200 - elapsed)
+                hours = remaining // 3600
+                minutes = (remaining % 3600) // 60
+                await ctx.send(f"⏳ *Patience... You must wait **{hours}h {minutes}m** before using **!{action_name}** again.*")
+                return
 
         async with AsyncSessionLocal() as session:
             # Fetch or create author profile
@@ -21,21 +35,10 @@ class PlayfulActions(commands.Cog):
                 author_db = GlobalUser(user_id=ctx.author.id, lunas=100, actions_given=0, actions_received=0)
                 session.add(author_db)
 
-            # Safeguard default values if DB returns None for counters
             if author_db.lunas is None:
                 author_db.lunas = 100
             if author_db.actions_given is None:
                 author_db.actions_given = 0
-
-            # Check 12-hour cooldown
-            if author_db.last_action:
-                elapsed = (now - author_db.last_action).total_seconds()
-                if elapsed < 43200:  # 12 hours in seconds
-                    remaining = int(43200 - elapsed)
-                    hours = remaining // 3600
-                    minutes = (remaining % 3600) // 60
-                    await ctx.send(f"⏳ *Patience... You must wait **{hours}h {minutes}m** before taking another action.*")
-                    return
 
             # Determine reward & apply updates
             lunas_earned = random.randint(20, 100)
@@ -66,6 +69,9 @@ class PlayfulActions(commands.Cog):
 
             await session.commit()
 
+        # Update individual action cooldown stamp
+        self.action_cooldowns[user_key] = now
+
         # Format public response based on targeting
         if action_name == "threesome":
             t1 = target.mention if target else ctx.author.mention
@@ -80,7 +86,7 @@ class PlayfulActions(commands.Cog):
             description=f"{desc}\n\n✨ Earned **+{lunas_earned} Lunas**.",
             color=0x8B0000
         )
-        embed.set_footer(text="Cooldown: 12 Hours")
+        embed.set_footer(text=f"Cooldown for !{action_name}: 12 Hours")
         await ctx.send(embed=embed)
 
     @commands.command(name="whip")
