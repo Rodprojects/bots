@@ -16,17 +16,6 @@ class PlayfulActions(commands.Cog):
         now = datetime.datetime.utcnow()
         user_key = (ctx.author.id, action_name)
 
-        # Per-action 12-hour cooldown check
-        if user_key in self.action_cooldowns:
-            last_used = self.action_cooldowns[user_key]
-            elapsed = (now - last_used).total_seconds()
-            if elapsed < 43200:  # 12 hours
-                remaining = int(43200 - elapsed)
-                hours = remaining // 3600
-                minutes = (remaining % 3600) // 60
-                await ctx.send(f"⏳ *Patience... You must wait **{hours}h {minutes}m** before using **!{action_name}** again.*")
-                return
-
         async with AsyncSessionLocal() as session:
             # Fetch or create author profile
             res_author = await session.execute(select(GlobalUser).where(GlobalUser.user_id == ctx.author.id))
@@ -39,6 +28,21 @@ class PlayfulActions(commands.Cog):
                 author_db.lunas = 100
             if author_db.actions_given is None:
                 author_db.actions_given = 0
+
+            # Per-action 12-hour cooldown check via memory or DB fallback
+            if user_key in self.action_cooldowns:
+                last_used = self.action_cooldowns[user_key]
+            else:
+                last_used = author_db.last_action
+
+            if last_used:
+                elapsed = (now - last_used).total_seconds()
+                if elapsed < 43200:  # 12 hours
+                    remaining = int(43200 - elapsed)
+                    hours = remaining // 3600
+                    minutes = (remaining % 3600) // 60
+                    await ctx.send(f"⏳ *Patience... You must wait **{hours}h {minutes}m** before using **!{action_name}** again.*")
+                    return
 
             # Determine reward & apply updates
             lunas_earned = random.randint(20, 100)
