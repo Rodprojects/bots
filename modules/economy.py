@@ -1,4 +1,4 @@
-import discordimport discord
+import discord
 from discord.ext import commands
 import datetime
 from sqlalchemy.future import select
@@ -13,7 +13,7 @@ class EconomyModule(commands.Cog):
         result = await session.execute(select(GlobalUser).where(GlobalUser.user_id == user_id))
         user = result.scalar_one_or_none()
         if not user:
-            user = GlobalUser(user_id=user_id, lunas=100) # 100 Lunas welcome gift
+            user = GlobalUser(user_id=user_id, lunas=100)
             session.add(user)
             await session.commit()
             await session.refresh(user)
@@ -29,13 +29,13 @@ class EconomyModule(commands.Cog):
             embed = discord.Embed(
                 title=f"🌙 Vault of {target.display_name}",
                 description=f"Your global wealth across the Night empire:\n\n💎 **{user.lunas:,} Lunas**",
-                color=0x4B0082  # Luxurious Purple
+                color=0x4B0082
             )
             embed.set_thumbnail(url=target.display_avatar.url)
             embed.set_footer(text="Earned worldwide. Spent wherever you desire.")
             await ctx.send(embed=embed)
 
-    @commands.command(name="pay", aliases=[payments := "transfer"], help="Transfers Lunas from your global wallet to another member.")
+    @commands.command(name="pay", aliases=["transfer"], help="Transfers Lunas from your global wallet to another member.")
     async def pay(self, ctx: commands.Context, member: discord.Member, amount: int):
         if member.id == ctx.author.id:
             await ctx.send("❌ *Trying to pay yourself? Clever, but the vault doesn't work that way.*")
@@ -102,7 +102,6 @@ class EconomyModule(commands.Cog):
         async with AsyncSessionLocal() as session:
             user = await self.get_or_create_user(session, ctx.author.id)
 
-            # Check if already owned
             existing = await session.execute(
                 select(GlobalInventory).where(
                     GlobalInventory.user_id == ctx.author.id,
@@ -117,7 +116,6 @@ class EconomyModule(commands.Cog):
                 await ctx.send(f"❌ *Insufficient funds. You need **{item_data['cost']:,} Lunas**, but your vault only holds **{user.lunas:,} Lunas**.*")
                 return
 
-            # Deduct cost and add to inventory
             user.lunas -= item_data["cost"]
             new_item = GlobalInventory(user_id=ctx.author.id, item_name=item_data["name"])
             session.add(new_item)
@@ -135,7 +133,6 @@ class EconomyModule(commands.Cog):
         target = member or ctx.author
 
         async with AsyncSessionLocal() as session:
-            # Ensure user exists
             await self.get_or_create_user(session, target.id)
 
             result = await session.execute(
